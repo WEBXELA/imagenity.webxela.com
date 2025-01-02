@@ -16,7 +16,7 @@ export function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Wand2 className="w-6 h-6 text-blue-600" />
-              <span className="font-semibold text-xl">TextBehind</span>
+              <span className="font-semibold text-xl">Imagenity</span>
             </div>
             <div className="flex items-center gap-6">
               <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
@@ -127,9 +127,9 @@ export function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Wand2 className="w-6 h-6 text-blue-600" />
-              <span className="font-semibold">TextBehind</span>
+              <span className="font-semibold">Imagenity</span>
             </div>
-            <p className="text-gray-600">© 2024 TextBehind. All rights reserved.</p>
+            <p className="text-gray-600">© 2024 WEBXELA. All rights reserved.</p>
           </div>
         </div>
       </footer>
