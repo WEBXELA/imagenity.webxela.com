@@ -1,4 +1,6 @@
-import { API_KEYS } from '../config/constants';
+import { AzureApiError } from './azure/errors';
+import { segmentForeground } from './azure/segmentation';
+import { preprocessImage } from './imagePreprocessing';
 
 export class ImageProcessingError extends Error {
   constructor(message: string, public readonly code: string) {
@@ -9,39 +11,57 @@ export class ImageProcessingError extends Error {
 
 export interface RemoveBgOptions {
   size?: 'regular' | 'medium' | 'hd' | '4k';
+  detectFaces?: boolean;
+  enhanceFaces?: boolean;
 }
 
 export async function removeBackground(imageFile: File, options: RemoveBgOptions = {}): Promise<string> {
-  const apiKey = API_KEYS.REMOVE_BG;
-  
-  const formData = new FormData();
-  formData.append('image_file', imageFile);
-  
-  if (options.size) {
-    formData.append('size', options.size);
-  }
-
   try {
-    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': apiKey,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      const errorMessage = errorData?.errors?.[0]?.title || response.statusText;
+    // Validate file size (max 4MB for Azure's free tier)
+    if (imageFile.size > 4 * 1024 * 1024) {
       throw new ImageProcessingError(
-        `API Error: ${errorMessage}`,
-        'API_ERROR'
+        'Image size must be less than 4MB',
+        'FILE_TOO_LARGE'
       );
     }
 
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
+    // Validate file type
+    if (!imageFile.type.startsWith('image/')) {
+      throw new ImageProcessingError(
+        'Invalid file type. Please upload an image.',
+        'INVALID_FILE_TYPE'
+      );
+    }
+
+    // Pre-process image to enhance face detection
+    const processedFile = await preprocessImage(imageFile, {
+      enhanceFaces: options.enhanceFaces ?? true,
+      detectFaces: options.detectFaces ?? true
+    });
+    
+    // Convert File to ArrayBuffer
+    const imageData = await processedFile.arrayBuffer();
+    
+    // First attempt with face detection
+    try {
+      const foregroundBlob = await segmentForeground(imageData, { detectFaces: true });
+      return URL.createObjectURL(foregroundBlob);
+    } catch (error) {
+      // If face detection fails, try without it
+      if (error instanceof AzureApiError && error.code === 'FACE_DETECTION_FAILED') {
+        console.warn('Face detection failed, falling back to general segmentation');
+        const foregroundBlob = await segmentForeground(imageData, { detectFaces: false });
+        return URL.createObjectURL(foregroundBlob);
+      }
+      throw error;
+    }
   } catch (error) {
+    if (error instanceof AzureApiError) {
+      throw new ImageProcessingError(
+        `Azure API Error: ${error.message}`,
+        error.code
+      );
+    }
     if (error instanceof ImageProcessingError) {
       throw error;
     }

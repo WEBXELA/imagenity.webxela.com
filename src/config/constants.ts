@@ -5,6 +5,11 @@ export const FONT_SIZES = {
 } as const;
 
 export const API_KEYS = {
-  REMOVE_BG: 'grrEKHD8THW8L4Zo3fTDdSdK',
-  GOOGLE_FONTS: 'AIzaSyBpjra-TDy7uSzCZy6F-NRw5qbVKl_FtZg'
+  FACE_API: '6hqgKUU20GIYTS0RCIk0UYqBekuYfyuAkICgTUb8wBeZI0S0BMgYJQQJ99BAACYeBjFXJ3w3AAAKACOGqD2p',
+  COMPUTER_VISION: 'DeX1LbBca5wXNsur24d8RlCtfF0Xk20XoxOmsOavFnwHVw5SEgrjJQQJ99BAACYeBjFXJ3w3AAAFACOG8Dmq'
+} as const;
+
+export const API_ENDPOINTS = {
+  FACE_API: 'https://yatri-img.cognitiveservices.azure.com',
+  COMPUTER_VISION: 'https://wx-cv-imagenity-ai.cognitiveservices.azure.com'
 } as const;

@@ -10,7 +10,7 @@ export function Header() {
     <header className="h-16 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Wand2 className="w-6 h-6 text-blue-600" />
-        <span className="font-semibold text-gray-900">Text Behind Image</span>
+        <span className="font-semibold text-gray-900">Imagenity</span>
       </div>
       
       <div className="flex items-center gap-4">
